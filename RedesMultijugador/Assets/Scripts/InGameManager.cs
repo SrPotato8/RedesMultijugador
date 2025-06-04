@@ -1,10 +1,24 @@
-using Unity.Netcode;
+﻿using Unity.Netcode;
 using UnityEngine;
 
 public class InGameManager : NetworkBehaviour
 {
     public GameObject[] m_Skins;
-    public Transform BallSpawnPoint;
+    public Transform HostBallSpawnPoint;
+    public Transform ClientBallSpawnPoint;
+
+    private void Start()
+    {
+        if (IsHost)
+        {
+            HostBallSpawnPoint = GameObject.Find("HostSpawnPoint").transform;
+        }
+        else if (IsClient && !IsHost)
+        {
+            ClientBallSpawnPoint = GameObject.Find("ClientSpawnPoint").transform;
+        }
+    }
+
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -15,8 +29,16 @@ public class InGameManager : NetworkBehaviour
             var playerObject = client.PlayerObject;
             LobbyPlayer lobbyPlayer = playerObject.GetComponent<LobbyPlayer>();
 
-            GameObject skin = GameObject.Instantiate(m_Skins[lobbyPlayer.m_SkinIndex.Value], BallSpawnPoint);
-            skin.GetComponent<NetworkObject>().SpawnWithOwnership(client.ClientId);
+            if (IsHost)
+            {
+                GameObject skin = GameObject.Instantiate(m_Skins[lobbyPlayer.m_SkinIndex.Value], HostBallSpawnPoint);
+                skin.GetComponent<NetworkObject>().SpawnWithOwnership(client.ClientId);
+            }
+            else if (IsClient && !IsHost)
+            {
+                GameObject skin = GameObject.Instantiate(m_Skins[lobbyPlayer.m_SkinIndex.Value], ClientBallSpawnPoint);
+                skin.GetComponent<NetworkObject>().SpawnWithOwnership(client.ClientId);
+            }
         }
     }
 }

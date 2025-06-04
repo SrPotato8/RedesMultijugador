@@ -485,7 +485,7 @@ MonoBehaviour:
   maxLaunchForce: 13
   forceIncreaseSpeed: 4
   hasLaunched: 0
-  TimeToRespawn: 1
+  TimeToRespawn: 3
   launchDirection: {x: 0, y: 0.8, z: 0.5}
   directionAdjustment: 0.5
   trajectoryLine: {fileID: 8350208753061199597}

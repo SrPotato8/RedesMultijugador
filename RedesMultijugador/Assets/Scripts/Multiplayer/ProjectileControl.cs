@@ -45,7 +45,24 @@ public class ProjectileControl : NetworkBehaviour
 
     void Start()
     {
-        spawnPoint = GameObject.Find("HostSpawnPoint").transform;
+        if (!IsOwner)
+        {
+            Debug.Log($"[ProjectileControl] Not owner, disabling input for ClientId: {NetworkManager.Singleton.LocalClientId}");
+            return;
+        }
+
+        Debug.Log($"[ProjectileControl] Ball launched by ClientId: {NetworkManager.Singleton.LocalClientId}");
+
+        if (IsHost && IsServer)
+        {
+            spawnPoint = GameObject.Find("HostSpawnPoint").transform;
+            Debug.Log("Assigned Host");
+        }
+        else if (IsClient && !IsHost)
+        {
+            spawnPoint = GameObject.Find("ClientSpawnPoint").transform;
+            Debug.Log("Assigned client");
+        }
         //timer = FindAnyObjectByType<TimerController>();
 
         fireworkEffect = GameObject.Instantiate(fireworkPrefab);
@@ -127,6 +144,12 @@ public class ProjectileControl : NetworkBehaviour
         }
     }
 
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        Debug.Log($"NetworkSpawn on client {NetworkManager.Singleton.LocalClientId}, IsOwner: {IsOwner}");
+    }
+
     void ShowTrajectory()
     {
             List<Vector3> points = new List<Vector3>();
@@ -198,17 +221,87 @@ public class ProjectileControl : NetworkBehaviour
 
     IEnumerator DestroyAndRespawn()
     {
-        yield return new WaitForSeconds(TimeToRespawn); 
+        //yield return new WaitForSeconds(TimeToRespawn);
 
-        Vector3 spawnPosition = spawnPoint ? spawnPoint.position : ball.position; 
-        GameObject newBall = Instantiate(paperBallPrefab, spawnPosition, Quaternion.identity);
+        //if (!IsOwner) yield break;
 
-        ball = newBall.GetComponent<Rigidbody>(); 
-        ball.useGravity = false; 
-        ball.linearVelocity = Vector3.zero;
+        ////Vector3 spawnPosition = spawnPoint ? spawnPoint.position : ball.position;
+        //Vector3 spawnPosition = spawnPoint.position;
+        //if(spawnPoint == null)
+        //{
+        //    Debug.Log("There is no spawnPoint");
+        //}
 
-        hasLaunched = false; 
+        //GameObject newBall = Instantiate(paperBallPrefab, spawnPosition, Quaternion.identity);
+
+        //var networkObject = newBall.GetComponent<NetworkObject>();
+        //if (IsServer && networkObject != null)
+        //{
+        //    networkObject.SpawnWithOwnership(OwnerClientId);
+        //}
+
+        //ball = newBall.GetComponent<Rigidbody>(); 
+        //ball.useGravity = false; 
+        //ball.linearVelocity = Vector3.zero;
+
+        //hasLaunched = false; 
+        //fireworkPlayed = false;
+
+        /************************************************************/
+
+        //yield return new WaitForSeconds(TimeToRespawn);
+
+        //if (spawnPoint == null)
+        //{
+        //    Debug.LogError("Missing spawnPoint on " + NetworkManager.Singleton.LocalClientId);
+        //    yield break;
+        //}
+
+        //Vector3 spawnPosition = spawnPoint.position;
+        //GameObject newBall = Instantiate(paperBallPrefab, spawnPosition, Quaternion.identity);
+
+        //ball = newBall.GetComponent<Rigidbody>();
+        //if (ball == null)
+        //{
+        //    Debug.LogError("Spawned object missing Rigidbody!");
+        //    yield break;
+        //}
+
+        //ball.useGravity = false;
+        //ball.linearVelocity = Vector3.zero;
+
+        //hasLaunched = false;
+        //fireworkPlayed = false;
+
+        yield return new WaitForSeconds(TimeToRespawn);
+
+        if (!IsOwner)
+            yield break; // Only owner should request respawn
+
+        SpawnBallServerRpc();
+
+        // Disable this local ball so it can be destroyed later on the server or by logic
+        ball.gameObject.SetActive(false);
+
+        hasLaunched = false;
         fireworkPlayed = false;
+    }
+
+    [ServerRpc]
+    void SpawnBallServerRpc()
+    {
+        if (paperBallPrefab == null || spawnPoint == null)
+        {
+            Debug.LogError("Missing paperBallPrefab or spawnPoint on server");
+            return;
+        }
+
+        GameObject newBall = Instantiate(paperBallPrefab, spawnPoint.position, Quaternion.identity);
+        var networkObject = newBall.GetComponent<NetworkObject>();
+        if (networkObject != null)
+        {
+            networkObject.SpawnWithOwnership(OwnerClientId);
+        }
     }
 
     public void PlayAudio(AudioClip audio)
