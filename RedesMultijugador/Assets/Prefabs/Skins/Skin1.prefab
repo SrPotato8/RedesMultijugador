@@ -401,6 +401,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   m_ObjectsToActivate:
   - {fileID: 1882612731023456308}
+  camera1: {fileID: 1882612731023456308}
+  camera2: {fileID: 0}
 --- !u!1 &7064020534336830253
 GameObject:
   m_ObjectHideFlags: 0

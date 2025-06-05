@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1536
     height: 772.8
   m_ShowMode: 4
-  m_Title: Game
+  m_Title: Hierarchy
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -121,7 +121,7 @@ MonoBehaviour:
   m_MinSize: {x: 400, y: 100}
   m_MaxSize: {x: 32384, y: 16192}
   vertical: 0
-  controlID: 5235
+  controlID: 116
   draggingID: 0
 --- !u!114 &6
 MonoBehaviour:
@@ -147,7 +147,7 @@ MonoBehaviour:
   m_MinSize: {x: 100, y: 100}
   m_MaxSize: {x: 8096, y: 16192}
   vertical: 1
-  controlID: 5133
+  controlID: 25
   draggingID: 0
 --- !u!114 &7
 MonoBehaviour:
@@ -889,9 +889,9 @@ MonoBehaviour:
   m_AudioPlay: 0
   m_DebugDrawModesUseInteractiveLightBakingData: 0
   m_Position:
-    m_Target: {x: 441.23813, y: 154.43999, z: 195.38953}
+    m_Target: {x: 0, y: 4.19, z: -13.52}
     speed: 2
-    m_Value: {x: 441.23813, y: 154.43999, z: 195.38953}
+    m_Value: {x: 0, y: 4.19, z: -13.52}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -937,13 +937,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: -0.016608715, y: -0.007300475, z: 0.00012491186, w: -0.99985784}
+    m_Target: {x: -0.10781689, y: 0.19659065, z: -0.021751398, w: -0.9743205}
     speed: 2
-    m_Value: {x: -0.016608343, y: -0.0073003117, z: 0.00012490907, w: -0.99983543}
+    m_Value: {x: -0.107814424, y: 0.19658615, z: -0.0217509, w: -0.9742982}
   m_Size:
-    m_Target: 480.4454
+    m_Target: 10
     speed: 2
-    m_Value: 480.4454
+    m_Value: 10
   m_Ortho:
     m_Target: 0
     speed: 2
@@ -1018,7 +1018,7 @@ MonoBehaviour:
       scrollPos: {x: 0, y: 0}
       m_SelectedIDs: 
       m_LastClickedID: 0
-      m_ExpandedIDs: ca63ffffd463ffffc665ffff86d60000ced60000
+      m_ExpandedIDs: 36e5feffb0eafeffd2f0fefffef6feffc0f9feff58fffeff2608ffff2a13ffffd214ffff5c19ffffd21bffffe21fffffaa23ffff0628ffffae29ffff0832ffff3c37ffffaa39ffffb43effffbe3effff0a41ffffbc46ffff4c4dffff5a4fffff6c53ffffa455ffffc457ffffb85bffff0462ffffe863ffffc265ffff50df000034e5000052f60000a4fa0000dafa0000d6fd0000
       m_RenameOverlay:
         m_UserAcceptedRename: 0
         m_Name: 
@@ -1102,14 +1102,14 @@ MonoBehaviour:
   m_LastFolders:
   - Assets/Scenes
   m_LastFoldersGridSize: -1
-  m_LastProjectPath: C:\Universidad\Tercero\Segundo_Trimestre\RedesSistemasMultijugador\RedesMultijugador\RedesMultijugador
+  m_LastProjectPath: C:\Users\david\Documents\GitHub\RedesMultijugador\RedesMultijugador
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: 52d60000
-    m_LastClickedID: 54866
-    m_ExpandedIDs: 000000003cd6000000ca9a3b
+    m_SelectedIDs: 5ad60000
+    m_LastClickedID: 54874
+    m_ExpandedIDs: 0000000044d6000054d600005cd6000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1138,7 +1138,7 @@ MonoBehaviour:
     scrollPos: {x: 0, y: 0}
     m_SelectedIDs: 
     m_LastClickedID: 0
-    m_ExpandedIDs: 000000003cd6000000ca9a3b
+    m_ExpandedIDs: 
     m_RenameOverlay:
       m_UserAcceptedRename: 0
       m_Name: 
@@ -1166,7 +1166,7 @@ MonoBehaviour:
   m_ListAreaState:
     m_SelectedInstanceIDs: 
     m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 0
+    m_HadKeyboardFocusLastEvent: 1
     m_ExpandedInstanceIDs: 7aa3000072a3000076a300005ca300006ca3000034a200003ca2000056a300008ea000004ca3000044a30000b6a00000
     m_RenameOverlay:
       m_UserAcceptedRename: 0

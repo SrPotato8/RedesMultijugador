@@ -45,6 +45,7 @@ public class ProjectileControl : NetworkBehaviour
 
     void Start()
     {
+        spawnPoint = GameObject.Find("HostSpawnPoint").transform;
         //timer = FindAnyObjectByType<TimerController>();
 
         fireworkEffect = GameObject.Instantiate(fireworkPrefab);
@@ -57,7 +58,7 @@ public class ProjectileControl : NetworkBehaviour
         }
 
         // Deactivate gravity when starting
-        //ball.useGravity = false;
+        ball.useGravity= false;
         ball.linearVelocity = Vector3.zero;
 
         if (trajectoryLine == null)

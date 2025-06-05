@@ -70,7 +70,7 @@ public class LobbyUIManager : NetworkBehaviour
             }
             if (allReady)
             {
-                NetworkManager.Singleton.SceneManager.LoadScene("Level", UnityEngine.SceneManagement.LoadSceneMode.Single);
+                NetworkManager.Singleton.SceneManager.LoadScene("MultiplayerLevel", UnityEngine.SceneManagement.LoadSceneMode.Single);
             }
         }
     }
