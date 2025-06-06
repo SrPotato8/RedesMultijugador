@@ -202,6 +202,8 @@ public class ClientProjectileController : NetworkBehaviour
             fireworkPlayed = true;
             Vector3 fireworkPosition = transform.position;
 
+            RequestScoreUpdateServerRpc();
+
             // Notify the server to trigger firework on all clients
             TriggerFireworkServerRpc(fireworkPosition);
         }
@@ -225,6 +227,15 @@ public class ClientProjectileController : NetworkBehaviour
 
         // Optional: auto-destroy after particle finishes
         Destroy(effect, ps.main.duration + ps.main.startLifetime.constantMax);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void RequestScoreUpdateServerRpc(ServerRpcParams rpcParams = default)
+    {
+        if (ScoreManager.Instance != null)
+        {
+            ScoreManager.Instance.AddScoreServerRpc(OwnerClientId);
+        }
     }
 }
 

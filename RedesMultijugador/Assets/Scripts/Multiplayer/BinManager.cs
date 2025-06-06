@@ -1,7 +1,8 @@
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
-public class BinManager : MonoBehaviour
+public class BinManager : NetworkBehaviour
 {
     public GameObject paperBinPrefab;
     public float spawnInterval = 10f;
