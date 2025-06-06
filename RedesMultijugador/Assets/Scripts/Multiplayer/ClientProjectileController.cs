@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 
-public class ClientProjectileControl : NetworkBehaviour
+public class ClientProjectileController : NetworkBehaviour
 {
     public Rigidbody ball;
     public GameObject paperBallPrefab;
@@ -29,6 +29,7 @@ public class ClientProjectileControl : NetworkBehaviour
 
     void Start()
     {
+        // Este script solo debe estar activo en el cliente due�o, no en host o en otros clientes
         if (!IsOwner || IsHost)
         {
             enabled = false;
@@ -40,14 +41,19 @@ public class ClientProjectileControl : NetworkBehaviour
         fireworkEffect = Instantiate(fireworkPrefab);
         fireworkParticleSystem = fireworkEffect.GetComponent<ParticleSystem>();
 
-        ball.useGravity = false;
-        ball.linearVelocity = Vector3.zero;
+        if (ball != null)
+        {
+            ball.useGravity = false;
+            ball.linearVelocity = Vector3.zero;
+            ball.angularVelocity = Vector3.zero;
+        }
+
         currentLaunchForce = launchForce;
     }
 
     void Update()
     {
-        if (hasLaunched) return;
+        if (hasLaunched || ball == null) return;
 
         if (Input.GetKey(KeyCode.A)) launchDirection.x -= directionAdjustment * Time.deltaTime;
         if (Input.GetKey(KeyCode.D)) launchDirection.x += directionAdjustment * Time.deltaTime;
@@ -79,6 +85,8 @@ public class ClientProjectileControl : NetworkBehaviour
 
     void ShowTrajectory()
     {
+        if (trajectoryLine == null || ball == null) return;
+
         List<Vector3> points = new List<Vector3>();
         Vector3 startVelocity = launchDirection.normalized * currentLaunchForce / ball.mass;
 
@@ -95,9 +103,12 @@ public class ClientProjectileControl : NetworkBehaviour
 
     void LaunchBall()
     {
+        if (ball == null) return;
+
         hasLaunched = true;
         ball.useGravity = true;
         ball.linearVelocity = Vector3.zero;
+        ball.angularVelocity = Vector3.zero;
 
         Vector3 force = launchDirection.normalized * currentLaunchForce;
         ball.AddForce(force, ForceMode.Impulse);
@@ -109,33 +120,26 @@ public class ClientProjectileControl : NetworkBehaviour
         StartCoroutine(DestroyAndRespawn());
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if ((collision.gameObject.CompareTag("Hoop") || collision.gameObject.CompareTag("Hoop2")) && !fireworkPlayed)
-        {
-            fireworkEffect.transform.position = transform.position;
-            fireworkParticleSystem.Play();
-            fireworkPlayed = true;
-        }
-    }
-
     IEnumerator DestroyAndRespawn()
     {
         yield return new WaitForSeconds(TimeToRespawn);
 
         if (!IsOwner) yield break;
 
-        SpawnBallServerRpc();
-
         if (ball != null)
-            ball.gameObject.SetActive(false);
+        {
+            Destroy(ball.gameObject);  // Destruye la bola antigua para limpiar
+            ball = null;
+        }
 
         hasLaunched = false;
         fireworkPlayed = false;
+
+        SpawnBallServerRpc();
     }
 
     [ServerRpc]
-    void SpawnBallServerRpc()
+    void SpawnBallServerRpc(ServerRpcParams rpcParams = default)
     {
         if (paperBallPrefab == null || spawnPoint == null)
         {
@@ -146,6 +150,81 @@ public class ClientProjectileControl : NetworkBehaviour
         GameObject newBall = Instantiate(paperBallPrefab, spawnPoint.position, Quaternion.identity);
         NetworkObject netObj = newBall.GetComponent<NetworkObject>();
         if (netObj != null)
+        {
+            netObj.SpawnWithOwnership(OwnerClientId);
+            UpdateClientBallReferenceClientRpc(netObj.NetworkObjectId, OwnerClientId);
+        }
+    }
+
+    [ClientRpc]
+    void UpdateClientBallReferenceClientRpc(ulong newBallNetworkId, ulong targetClientId)
+    {
+        if (NetworkManager.Singleton.LocalClientId != targetClientId)
+            return;
+
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(newBallNetworkId, out var netObj))
+        {
+            ball = netObj.GetComponent<Rigidbody>();
+            if (ball != null)
+            {
+                ball.useGravity = false;
+                ball.linearVelocity = Vector3.zero;
+                ball.angularVelocity = Vector3.zero;
+                hasLaunched = false; // Reinicia para poder lanzar la nueva bola
+                Debug.Log("[Client] Nueva bola asignada correctamente.");
+            }
+        }
+        else
+        {
+            Debug.LogError("Could not find new ball with network ID");
+        }
+    }
+
+    [ServerRpc]
+    void SpawnBallServerRpc()
+    {
+        if (paperBallPrefab == null || spawnPoint == null)
+    {
+            Debug.LogError("Missing prefab or spawnPoint");
+            return;
+        }
+
+        GameObject newBall = Instantiate(paperBallPrefab, spawnPoint.position, Quaternion.identity);
+        NetworkObject netObj = newBall.GetComponent<NetworkObject>();
+        if (netObj != null)
             netObj.SpawnWithOwnership(OwnerClientId);
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if ((collision.gameObject.CompareTag("Hoop") ||  collision.gameObject.CompareTag("Hoop2")) && !fireworkPlayed)
+    {
+            fireworkPlayed = true;
+            Vector3 fireworkPosition = transform.position;
+
+            // Notify the server to trigger firework on all clients
+            TriggerFireworkServerRpc(fireworkPosition);
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void TriggerFireworkServerRpc(Vector3 position)
+    {
+        TriggerFireworkClientRpc(position);
+    }
+
+    [ClientRpc]
+    void TriggerFireworkClientRpc(Vector3 position)
+    {
+        if (fireworkPrefab == null) return;
+
+        GameObject effect = Instantiate(fireworkPrefab, position, Quaternion.identity);
+        ParticleSystem ps = effect.GetComponent<ParticleSystem>();
+        if (ps != null)
+            ps.Play();
+
+        // Optional: auto-destroy after particle finishes
+        Destroy(effect, ps.main.duration + ps.main.startLifetime.constantMax);
+    }
 }
+

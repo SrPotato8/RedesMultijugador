@@ -355,6 +355,7 @@ public class ProjectileControl : NetworkBehaviour
 
     void Start()
     {
+        this.gameObject.SetActive(true);
         // Solo el owner puede ejecutar este script
         if (!IsOwner)
         {
@@ -511,7 +512,7 @@ public class ProjectileControl : NetworkBehaviour
 
         if (ball != null)
         {
-            ball.gameObject.SetActive(false);
+            ball.gameObject.SetActive(true);
         }
 
         hasLaunched = false;

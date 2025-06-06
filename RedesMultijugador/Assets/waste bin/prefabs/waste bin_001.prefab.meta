@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: f79f2d361a911834fa32bbe9029eebe2
+timeCreated: 1477374866
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 73303
+  packageName: waste bin
+  packageVersion: 5.3.5
+  assetPath: Assets/projects/waste bin/prefabs/waste bin_001.prefab
+  uploadId: 146632

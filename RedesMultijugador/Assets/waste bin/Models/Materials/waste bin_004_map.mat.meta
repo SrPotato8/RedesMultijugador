@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: da5600f9e9e6d024298814f11309795c
+timeCreated: 1477372200
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 73303
+  packageName: waste bin
+  packageVersion: 5.3.5
+  assetPath: Assets/projects/waste bin/Models/Materials/waste bin_004_map.mat
+  uploadId: 146632

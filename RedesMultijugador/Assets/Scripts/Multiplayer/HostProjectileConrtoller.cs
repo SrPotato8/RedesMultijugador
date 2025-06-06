@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -109,15 +109,7 @@ public class HostProjectileControl : NetworkBehaviour
         StartCoroutine(DestroyAndRespawn());
     }
 
-    private void OnCollisionEnter(Collision collision)
-    {
-        if ((collision.gameObject.CompareTag("Hoop") || collision.gameObject.CompareTag("Hoop2")) && !fireworkPlayed)
-        {
-            fireworkEffect.transform.position = transform.position;
-            fireworkParticleSystem.Play();
-            fireworkPlayed = true;
-        }
-    }
+
 
     IEnumerator DestroyAndRespawn()
     {
@@ -148,4 +140,37 @@ public class HostProjectileControl : NetworkBehaviour
         if (netObj != null)
             netObj.SpawnWithOwnership(OwnerClientId);
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if ((collision.gameObject.CompareTag("Hoop") || collision.gameObject.CompareTag("Hoop2")) && !fireworkPlayed)
+    {
+            fireworkPlayed = true;
+            Vector3 fireworkPosition = transform.position;
+
+            // Notify the server to trigger firework on all clients
+            TriggerFireworkServerRpc(fireworkPosition);
+        }
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    void TriggerFireworkServerRpc(Vector3 position)
+    {
+        TriggerFireworkClientRpc(position);
+    }
+
+    [ClientRpc]
+    void TriggerFireworkClientRpc(Vector3 position)
+    {
+        if (fireworkPrefab == null) return;
+
+        GameObject effect = Instantiate(fireworkPrefab, position, Quaternion.identity);
+        ParticleSystem ps = effect.GetComponent<ParticleSystem>();
+        if (ps != null)
+            ps.Play();
+
+        // Optional: auto-destroy after particle finishes
+        Destroy(effect, ps.main.duration + ps.main.startLifetime.constantMax);
+    }
 }
+
